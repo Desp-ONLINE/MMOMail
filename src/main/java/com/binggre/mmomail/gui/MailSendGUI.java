@@ -4,8 +4,12 @@ import com.binggre.binggreapi.functions.HolderListener;
 import com.binggre.binggreapi.utils.EconomyManager;
 import com.binggre.binggreapi.utils.ItemManager;
 import com.binggre.mmomail.MMOMail;
+import com.binggre.mmomail.api.MailAPI;
+import com.binggre.mmomail.api.MailSendResult;
 import com.binggre.mmomail.config.MessageConfig;
+import com.binggre.mmomail.objects.Mail;
 import com.binggre.mmomail.objects.PlayerMail;
+import com.binggre.mmomail.repository.PlayerRepository;
 import com.binggre.mmomail.util.MailUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +31,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class MailSendGUI implements InventoryHolder, HolderListener {
+
+    private final PlayerRepository playerRepository = MMOMail.getInstance().getPlayerRepository();
 
     private static final int LETTER_SLOT = 0;
     private static final int ITEM_SLOT = 1;
@@ -113,9 +119,18 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
             return;
         }
 
+        MailAPI mailAPI = MMOMail.getInstance().getMailAPI();
+        Mail mail = mailAPI.createMail(playerMail.getNickname(), letter, money, items);
+
+        MailSendResult mailSendResult = mailAPI.sendMail(targetName, mail);
+        MessageConfig messageConfig = messageConfig();
+        switch (mailSendResult) {
+            case NOT_FOUND_PLAYER -> player.sendMessage(messageConfig.getSendNotFoundPlayer());
+            case SUCCESS -> player.sendMessage(messageConfig.getSendSuccess().replace("<player>", targetName));
+            case ONLINE_AND_NOT_LOAD -> player.sendMessage(messageConfig.getSendOnlineAndNotLoad());
+        }
         send = true;
         player.closeInventory();
-        player.sendMessage(messageConfig().getSend().replace("<player>", targetName));
     }
 
     @Override

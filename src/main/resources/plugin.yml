@@ -6,3 +6,4 @@ authors: [ binggre ]
 depend: [ 'BinggreAPI', 'MongoLibraryPlugin', 'VelocitySocketClient' ]
 commands:
   메일:
+  test:

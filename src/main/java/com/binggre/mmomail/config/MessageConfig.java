@@ -27,7 +27,10 @@ public class MessageConfig {
     private String inputLetter = "\n내용을 입력해 주세요.\n취소하려면 '취소' 또는 'cancel'\n ";
     private String inputGold = "\n금액을 입력해 주세요.\n취소하려면 '취소' 또는 'cancel'\n ";
     private String inputErrorNum = "숫자를 입력해 주세요";
-    private String send = "<player>님에게 메일을 전송했습니다.";
+
+    private String sendSuccess = "<player>님에게 메일을 전송했습니다.";
+    private String sendNotFoundPlayer = "존재하지 않는 플레이어입니다.";
+    private String sendOnlineAndNotLoad = "해당 플레이어는 로딩중입니다. 잠시 후 다시 시도해 주세요.";
 
     public void init() {
         MongoCollection<Document> collection = MongoLibraryPlugin.getInst()
@@ -44,7 +47,9 @@ public class MessageConfig {
             document.put("inputLetter", inputLetter);
             document.put("inputGold", inputGold);
             document.put("inputErrorNum", inputErrorNum);
-            document.put("send", send);
+            document.put("sendSuccess", sendSuccess);
+            document.put("sendNotFoundPlayer", sendNotFoundPlayer);
+            document.put("sendOnlineAndNotLoad", sendOnlineAndNotLoad);
             collection.insertOne(document);
 
         } else {

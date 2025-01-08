@@ -1,27 +1,38 @@
 package com.binggre.mmomail.listeners;
 
+import com.binggre.binggreapi.utils.ItemManager;
 import com.binggre.binggreapi.utils.NumberUtil;
 import com.binggre.mmomail.MMOMail;
+import com.binggre.mmomail.api.MailAPI;
 import com.binggre.mmomail.config.MessageConfig;
 import com.binggre.mmomail.gui.MailSendGUI;
+import com.binggre.mmomail.objects.Mail;
 import com.binggre.mmomail.objects.PlayerMail;
 import com.binggre.mmomail.repository.PlayerRepository;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.List;
+
 public class PlayerListener implements Listener {
 
     private final PlayerRepository repository = MMOMail.getInstance().getPlayerRepository();
+    private final MailAPI mailAPI = MMOMail.getInstance().getMailAPI();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         repository.findByIdAsync(player.getUniqueId(), playerMail -> {
             playerMail = repository.init(player, playerMail);
+            playerMail.updateNickname(player);
+            Mail mail = mailAPI.createMail("test", "testLetter", 10, List.of(ItemManager.create(Material.DIAMOND, "testItem")));
+            playerMail.addMail(mail);
+            repository.save(playerMail);
             repository.putIn(playerMail);
         });
     }

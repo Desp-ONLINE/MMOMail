@@ -22,9 +22,9 @@ public class PlayerMail implements MongoData<UUID> {
     private transient MailSendGUI mailSendGUI;
 
     public PlayerMail(Player player) {
-        this.id = player.getUniqueId();
-        this.nickname = player.getName();
-        this.mails = new ArrayList<>();
+        id = player.getUniqueId();
+        nickname = player.getName();
+        mails = new ArrayList<>();
     }
 
     @Override
