@@ -46,7 +46,6 @@ public class PlayerListener implements Listener {
         PlayerMail playerMail = repository.get(player.getUniqueId());
 
         if (playerMail == null) {
-            System.out.println("re1");
             return;
         }
         MailSendGUI mailSendGUI = (MailSendGUI) metadataManager.getEntity(player, MAIL_SEND_GUI);

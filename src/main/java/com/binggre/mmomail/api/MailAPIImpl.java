@@ -50,7 +50,6 @@ public class MailAPIImpl implements MailAPI {
                 .getUUID(targetNickname);
 
         if (targetUUID == null) {
-            System.out.println("FF");
             return MailSendResult.NOT_FOUND_PLAYER;
         }
 
@@ -63,7 +62,6 @@ public class MailAPIImpl implements MailAPI {
             updateMailGUI(targetNickname);
 
         } else {
-            System.out.println("TEST");
             playerMail = playerRepository.findByFilter("nickname", targetNickname);
             if (playerMail == null) {
                 return MailSendResult.NOT_FOUND_PLAYER;
