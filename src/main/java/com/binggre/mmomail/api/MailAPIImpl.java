@@ -1,11 +1,15 @@
 package com.binggre.mmomail.api;
 
 import com.binggre.mmomail.MMOMail;
+import com.binggre.mmomail.gui.MailCheckGUI;
+import com.binggre.mmomail.listeners.velocity.MailGUIUpdateListener;
 import com.binggre.mmomail.objects.Mail;
 import com.binggre.mmomail.objects.PlayerMail;
 import com.binggre.mmomail.repository.PlayerRepository;
+import com.binggre.mmoplayerdata.MMOPlayerDataPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -19,26 +23,53 @@ public class MailAPIImpl implements MailAPI {
     }
 
     @Override
-    public MailSendResult sendMail(String targetNickname, Mail mail) {
+    public Mail createMail(String sender, List<String> letter, double money, List<ItemStack> itemStacks) {
+        return new Mail(sender, letter, money, itemStacks);
+    }
+
+    @Override
+    public void updateMailGUI(String targetNickname) {
         Player target = Bukkit.getPlayer(targetNickname);
+        if (target != null) {
+            Inventory topInventory = target.getOpenInventory().getTopInventory();
+            if (topInventory.getHolder() instanceof MailCheckGUI mailCheckGUI) {
+                mailCheckGUI.refresh();
+            }
+        } else {
+            MMOMail.getInstance()
+                    .getSocketClient()
+                    .send(MailGUIUpdateListener.class, targetNickname);
+        }
+    }
+
+    @Override
+    public MailSendResult sendMail(String targetNickname, Mail mail) {
         PlayerRepository playerRepository = MMOMail.getInstance().getPlayerRepository();
 
-        if (target != null) {
-            UUID uniqueId = target.getUniqueId();
-            PlayerMail playerMail = playerRepository.get(uniqueId);
-            if (playerMail == null) {
-                return MailSendResult.ONLINE_AND_NOT_LOAD;
-            }
+        UUID targetUUID = MMOPlayerDataPlugin.getInstance().getPlayerRepository()
+                .getUUID(targetNickname);
+
+        if (targetUUID == null) {
+            System.out.println("FF");
+            return MailSendResult.NOT_FOUND_PLAYER;
+        }
+
+        PlayerMail playerMail = playerRepository.get(targetUUID);
+        if (playerMail != null) {
             playerMail.addMail(mail);
-            playerRepository.saveAsync(playerMail);
+            playerRepository.putIn(playerMail);
+            playerRepository.save(playerMail);
+
+            updateMailGUI(targetNickname);
 
         } else {
-            PlayerMail playerMail = playerRepository.findByFilter("nickname", targetNickname);
+            System.out.println("TEST");
+            playerMail = playerRepository.findByFilter("nickname", targetNickname);
             if (playerMail == null) {
                 return MailSendResult.NOT_FOUND_PLAYER;
             }
             playerMail.addMail(mail);
-            playerRepository.saveAsync(playerMail);
+            playerRepository.save(playerMail);
         }
         return MailSendResult.SUCCESS;
     }

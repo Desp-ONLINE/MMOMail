@@ -1,15 +1,16 @@
 package com.binggre.mmomail.objects;
 
-import com.binggre.mmomail.gui.MailSendGUI;
+import com.binggre.binggreapi.utils.EconomyManager;
+import com.binggre.binggreapi.utils.InventoryManager;
+import com.binggre.mmomail.config.MessageConfig;
 import com.binggre.mongolibraryplugin.base.MongoData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class PlayerMail implements MongoData<UUID> {
@@ -17,9 +18,6 @@ public class PlayerMail implements MongoData<UUID> {
     private final UUID id;
     private String nickname;
     private final List<Mail> mails;
-
-    private transient SignType signType;
-    private transient MailSendGUI mailSendGUI;
 
     public PlayerMail(Player player) {
         id = player.getUniqueId();
@@ -42,33 +40,31 @@ public class PlayerMail implements MongoData<UUID> {
         this.mails.add(mail);
     }
 
+    public boolean receive(int index) {
+        Player player = toPlayer();
+        if (player == null) {
+            throw new NullPointerException("플레이어가 오프라인입니다.");
+        }
+        Mail mail = mails.get(index);
+        List<ItemStack> itemStacks = mail.getItemStacks();
+        if (!itemStacks.isEmpty()) {
+            int size = itemStacks.size();
+            if (!InventoryManager.hasEmpty(player, size)) {
+                int emptySize = (int) Arrays.stream(player.getInventory().getStorageContents()).filter(Objects::isNull).count();
+                int has = size - emptySize;
+                String inventoryCheck = MessageConfig.getInstance().getInventoryCheck();
+                player.sendMessage(inventoryCheck.replace("<size>", String.valueOf(has)));
+                return false;
+            }
+            player.getInventory().addItem(itemStacks.toArray(new org.bukkit.inventory.ItemStack[0]));
+        }
+        EconomyManager.addMoney(player, mail.getMoney());
+        mails.remove(index);
+        return true;
+    }
+
     @Nullable
     public Player toPlayer() {
         return Bukkit.getPlayer(id);
-    }
-
-
-    public boolean isSign() {
-        return signType != null || mailSendGUI != null;
-    }
-
-    public void closeSign() {
-        Player player = toPlayer();
-        if (player != null) {
-            player.openInventory(mailSendGUI.getInventory());
-        }
-        this.signType = null;
-        this.mailSendGUI = null;
-    }
-
-    public void openSign(SignType signType, MailSendGUI mailSendGUI) {
-        this.signType = signType;
-        this.mailSendGUI = mailSendGUI;
-    }
-
-    public enum SignType {
-
-        LETTER, GOLD, ITEM
-
     }
 }

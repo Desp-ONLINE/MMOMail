@@ -1,6 +1,7 @@
 package com.binggre.mmomail.objects;
 
 import com.binggre.binggreapi.utils.ItemManager;
+import com.binggre.mmomail.util.MailUtil;
 import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,8 +16,9 @@ import java.util.Objects;
 public class Mail {
 
     private final String sender;
-    private final String letter;
+    private final List<String> letter;
     private final double money;
+    private boolean read;
 
     @Getter(AccessLevel.PRIVATE)
     @SerializedName("items")
@@ -25,12 +27,26 @@ public class Mail {
 
     public Mail(String sender, String letter, double money, List<ItemStack> itemStacks) {
         this.sender = sender;
+        this.letter = MailUtil.splitLetter(letter, 15);
+        this.money = money;
+        this.date = LocalDateTime.now();
+        this.serializedItemStacks = new ArrayList<>();
+        this.read = false;
+        itemStacks.forEach(itemStack -> serializedItemStacks.add(itemStack.serializeAsBytes()));
+    }
+
+    public Mail(String sender, List<String> letter, double money, List<ItemStack> itemStacks) {
+        this.sender = sender;
         this.letter = letter;
         this.money = money;
         this.date = LocalDateTime.now();
         this.serializedItemStacks = new ArrayList<>();
-
+        this.read = false;
         itemStacks.forEach(itemStack -> serializedItemStacks.add(itemStack.serializeAsBytes()));
+    }
+
+    public void read() {
+        this.read = true;
     }
 
     public List<ItemStack> getItemStacks() {

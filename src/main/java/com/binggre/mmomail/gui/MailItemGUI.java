@@ -51,6 +51,7 @@ public class MailItemGUI implements InventoryHolder, HolderListener {
             mailSendGUI.items.add(itemStack);
         });
         mailSendGUI.refresh();
+        mailSendGUI.closeSign();
         Bukkit.getScheduler().runTask(MMOMail.getInstance(), () -> mailSendGUI.player.openInventory(mailSendGUI.getInventory()));
     }
 

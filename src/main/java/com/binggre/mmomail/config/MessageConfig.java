@@ -24,6 +24,7 @@ public class MessageConfig {
 
     private String prefix = "[메일] ";
     private String shortOfMoney = "골드가 부족합니다.";
+    private String inventoryCheck = "인벤토리 공간이 <size>칸 부족합니다.";
     private String inputLetter = "\n내용을 입력해 주세요.\n취소하려면 '취소' 또는 'cancel'\n ";
     private String inputGold = "\n금액을 입력해 주세요.\n취소하려면 '취소' 또는 'cancel'\n ";
     private String inputErrorNum = "숫자를 입력해 주세요";
@@ -44,6 +45,7 @@ public class MessageConfig {
             Document document = new Document();
             document.put("prefix", prefix);
             document.put("shortOfMoney", shortOfMoney);
+            document.put("inventoryCheck", inventoryCheck);
             document.put("inputLetter", inputLetter);
             document.put("inputGold", inputGold);
             document.put("inputErrorNum", inputErrorNum);

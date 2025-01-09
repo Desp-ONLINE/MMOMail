@@ -1,22 +1,20 @@
 package com.binggre.mmomail;
 
 import com.binggre.binggreapi.BinggrePlugin;
+import com.binggre.binggreapi.utils.metadata.KeepMetadataManager;
+import com.binggre.binggreapi.utils.metadata.MetadataManager;
 import com.binggre.mmomail.api.MailAPI;
 import com.binggre.mmomail.api.MailAPIImpl;
-import com.binggre.mmomail.commands.UserCommand;
+import com.binggre.mmomail.commands.user.UserCommand;
+import com.binggre.mmomail.config.GUIConfig;
 import com.binggre.mmomail.config.MessageConfig;
-import com.binggre.mmomail.listeners.MerchantTradeListener;
 import com.binggre.mmomail.listeners.PlayerListener;
-import com.binggre.mmomail.objects.Mail;
-import com.binggre.mmomail.objects.PlayerMail;
+import com.binggre.mmomail.listeners.velocity.MailGUIUpdateListener;
 import com.binggre.mmomail.repository.PlayerRepository;
+import com.binggre.velocitysocketclient.VelocityClient;
+import com.binggre.velocitysocketclient.socket.SocketClient;
 import lombok.Getter;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @Getter
 public final class MMOMail extends BinggrePlugin implements CommandExecutor {
@@ -26,11 +24,17 @@ public final class MMOMail extends BinggrePlugin implements CommandExecutor {
     public static final String DATA_BASE_NAME = "MMO-Mail";
 
     private PlayerRepository playerRepository;
+    private SocketClient socketClient;
     private MailAPI mailAPI;
+    private final MetadataManager keepMetadataManager = new KeepMetadataManager(this);
 
     @Override
     public void onEnable() {
         instance = this;
+        saveResource("gui.json", false);
+
+        socketClient = VelocityClient.getInstance().getConnectClient();
+        socketClient.registerListener(MailGUIUpdateListener.class);
         mailAPI = new MailAPIImpl();
         playerRepository = new PlayerRepository(
                 this,
@@ -40,25 +44,12 @@ public final class MMOMail extends BinggrePlugin implements CommandExecutor {
 
         executeCommand(this, new UserCommand());
         registerEvents(this,
-                new PlayerListener(),
-                new MerchantTradeListener()
+                new PlayerListener()
         );
 
         playerRepository.init();
         MessageConfig.getInstance().init();
-        getCommand("test").setExecutor(this);
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        Player player = (Player) sender;
-        PlayerMail playerMail = playerRepository.get(player.getUniqueId());
-        for (Mail mail : playerMail.getMails()) {
-            for (ItemStack itemStack : mail.getItemStacks()) {
-                player.getInventory().addItem(itemStack);
-            }
-        }
-        return super.onCommand(sender, command, label, args);
+        GUIConfig.getInstance().init();
     }
 
     @Override

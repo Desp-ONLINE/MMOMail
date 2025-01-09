@@ -1,4 +1,4 @@
-package com.binggre.mmomail.commands.arguments;
+package com.binggre.mmomail.commands.user.arguments;
 
 import com.binggre.binggreapi.command.CommandArgument;
 import com.binggre.binggreapi.command.annotations.ArgumentOption;

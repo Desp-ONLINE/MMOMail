@@ -12,5 +12,9 @@ public interface MailAPI {
 
     Mail createMail(String sender, String letter, double money, List<ItemStack> itemStacks);
 
+    Mail createMail(String sender, List<String> letter, double money, List<ItemStack> itemStacks);
+
+    void updateMailGUI(String targetNickname);
+
     MailSendResult sendMail(String targetNickname, Mail mail);
 }

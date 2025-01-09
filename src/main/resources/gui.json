@@ -1,0 +1,48 @@
+{
+  "title": "메일함",
+  "size": 3,
+  "viewSize": 18,
+  "prevItem": {
+    "slot": 18,
+    "type": "arrow",
+    "displayName": "&f이전",
+    "amount": 1,
+    "customModelData": 0
+  },
+
+  "nextItem": {
+    "slot": 26,
+    "type": "arrow",
+    "displayName": "&f다음",
+    "amount": 1,
+    "customModelData": 0
+  },
+
+  "mailItem": {
+    "type": "chest",
+    "displayName": "&f보낸 사람 <sender>",
+    "lore": [
+      "&b[골드]",
+      "&e<gold>",
+      "",
+      "&b[편지]",
+      "<letter>",
+      "",
+      "&b[수령 아이템]",
+      "<items>"
+    ],
+    "amount": 1,
+    "customModelData": 0
+  },
+
+  "allReceiveItem": {
+    "slot": 22,
+    "type": "ender chest",
+    "displayName": "&f모두 수령",
+    "lore": [
+      ""
+    ],
+    "amount": 1,
+    "customModelData": 0
+  }
+}

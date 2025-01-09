@@ -3,13 +3,12 @@ package com.binggre.mmomail.gui;
 import com.binggre.binggreapi.functions.HolderListener;
 import com.binggre.binggreapi.utils.EconomyManager;
 import com.binggre.binggreapi.utils.ItemManager;
+import com.binggre.binggreapi.utils.metadata.MetadataManager;
 import com.binggre.mmomail.MMOMail;
 import com.binggre.mmomail.api.MailAPI;
 import com.binggre.mmomail.api.MailSendResult;
 import com.binggre.mmomail.config.MessageConfig;
 import com.binggre.mmomail.objects.Mail;
-import com.binggre.mmomail.objects.PlayerMail;
-import com.binggre.mmomail.repository.PlayerRepository;
 import com.binggre.mmomail.util.MailUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,9 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.binggre.mmomail.objects.MailMeta.MAIL_SEND_GUI;
+
 public class MailSendGUI implements InventoryHolder, HolderListener {
 
-    private final PlayerRepository playerRepository = MMOMail.getInstance().getPlayerRepository();
+    private static final MetadataManager metaDataManager = MMOMail.getInstance().getKeepMetadataManager();
 
     private static final int LETTER_SLOT = 0;
     private static final int ITEM_SLOT = 1;
@@ -41,17 +42,16 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
 
     public static void open(Player player, String nickname) {
         MailSendGUI mailSendGUI = new MailSendGUI(nickname);
-        mailSendGUI.playerMail = MMOMail.getInstance()
-                .getPlayerRepository()
-                .get(player.getUniqueId());
         mailSendGUI.player = player;
         player.openInventory(mailSendGUI.inventory);
+        metaDataManager.setEntity(player, MAIL_SEND_GUI, mailSendGUI);
     }
 
     private final Inventory inventory;
+    @Getter
+    private SignType signType = null;
     protected Player player;
     protected String targetName;
-    protected PlayerMail playerMail;
     protected List<ItemStack> items = new ArrayList<>();
 
     private boolean send;
@@ -120,7 +120,7 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
         }
 
         MailAPI mailAPI = MMOMail.getInstance().getMailAPI();
-        Mail mail = mailAPI.createMail(playerMail.getNickname(), letter, money, items);
+        Mail mail = mailAPI.createMail(player.getName(), letter, money, items);
 
         MailSendResult mailSendResult = mailAPI.sendMail(targetName, mail);
         MessageConfig messageConfig = messageConfig();
@@ -154,17 +154,18 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
 
         switch (slot) {
             case LETTER_SLOT -> {
-                playerMail.openSign(PlayerMail.SignType.LETTER, this);
+                signType = SignType.SEND_LETTER;
+
                 player.closeInventory();
                 player.sendMessage(messageConfig().getInputLetter());
             }
             case GOLD_SLOT -> {
-                playerMail.openSign(PlayerMail.SignType.GOLD, this);
+                signType = SignType.SEND_MONEY;
                 player.closeInventory();
                 player.sendMessage(messageConfig().getInputGold());
             }
             case ITEM_SLOT -> {
-                playerMail.openSign(PlayerMail.SignType.ITEM, this);
+                signType = SignType.SEND_ITEM;
                 MailItemGUI.open(this);
             }
             case SEND_SLOT -> send();
@@ -176,11 +177,11 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
         if (!(event.getInventory().getHolder() instanceof MailSendGUI)) {
             return;
         }
-        if (send || playerMail.isSign()) {
+        if (send || signType != null) {
             return;
         }
-
         player.getInventory().addItem(items.toArray(new ItemStack[0]));
+        metaDataManager.removeEntity(player, MAIL_SEND_GUI);
     }
 
     @Override
@@ -190,5 +191,15 @@ public class MailSendGUI implements InventoryHolder, HolderListener {
 
     private MessageConfig messageConfig() {
         return MessageConfig.getInstance();
+    }
+
+    public void closeSign() {
+        signType = null;
+    }
+
+    public enum SignType {
+        SEND_LETTER,
+        SEND_MONEY,
+        SEND_ITEM
     }
 }

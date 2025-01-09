@@ -1,9 +1,8 @@
 name: MMOMail
-version: '1.0.0'
+version: '${version}'
 main: com.binggre.mmomail.MMOMail
 api-version: '1.20'
 authors: [ binggre ]
-depend: [ 'BinggreAPI', 'MongoLibraryPlugin', 'VelocitySocketClient' ]
+depend: [ 'BinggreAPI', 'MongoLibraryPlugin', 'VelocitySocketClient', 'MMOPlayerData' ]
 commands:
   메일:
-  test:
