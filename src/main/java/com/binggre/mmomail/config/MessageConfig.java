@@ -42,17 +42,17 @@ public class MessageConfig {
         Document configDocument = collection.find().first();
 
         if (configDocument == null) {
-            Document document = new Document();
-            document.put("prefix", prefix);
-            document.put("shortOfMoney", shortOfMoney);
-            document.put("inventoryCheck", inventoryCheck);
-            document.put("inputLetter", inputLetter);
-            document.put("inputGold", inputGold);
-            document.put("inputErrorNum", inputErrorNum);
-            document.put("sendSuccess", sendSuccess);
-            document.put("sendNotFoundPlayer", sendNotFoundPlayer);
-            document.put("sendOnlineAndNotLoad", sendOnlineAndNotLoad);
-            collection.insertOne(document);
+            configDocument = new Document();
+            configDocument.put("prefix", prefix);
+            configDocument.put("shortOfMoney", shortOfMoney);
+            configDocument.put("inventoryCheck", inventoryCheck);
+            configDocument.put("inputLetter", inputLetter);
+            configDocument.put("inputGold", inputGold);
+            configDocument.put("inputErrorNum", inputErrorNum);
+            configDocument.put("sendSuccess", sendSuccess);
+            configDocument.put("sendNotFoundPlayer", sendNotFoundPlayer);
+            configDocument.put("sendOnlineAndNotLoad", sendOnlineAndNotLoad);
+            collection.insertOne(configDocument);
 
         } else {
             instance = FileManager.toObject(configDocument.toJson(), MessageConfig.class);
