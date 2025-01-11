@@ -7,6 +7,7 @@ import com.binggre.mmomail.objects.Mail;
 import com.binggre.mmomail.objects.PlayerMail;
 import com.binggre.mmomail.repository.PlayerRepository;
 import com.binggre.mmoplayerdata.MMOPlayerDataPlugin;
+import com.binggre.mmoplayerdata.objects.MMOPlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -45,10 +46,13 @@ public class MailAPIImpl implements MailAPI {
     @Override
     public MailSendResult sendMail(String targetNickname, Mail mail) {
         PlayerRepository playerRepository = MMOMail.getInstance().getPlayerRepository();
+        com.binggre.mmoplayerdata.repository.PlayerRepository mmoplayerRepository = MMOPlayerDataPlugin.getInstance().getPlayerRepository();
 
-        UUID targetUUID = MMOPlayerDataPlugin.getInstance().getPlayerRepository()
-                .getUUID(targetNickname);
-
+        UUID targetUUID = mmoplayerRepository.getUUID(targetNickname);
+        if (targetUUID == null) {
+            MMOPlayerData mmoPlayerData = mmoplayerRepository.findByFilter("nickname", targetNickname);
+            targetUUID = (mmoPlayerData != null) ? mmoPlayerData.getId() : null;
+        }
         if (targetUUID == null) {
             return MailSendResult.NOT_FOUND_PLAYER;
         }
