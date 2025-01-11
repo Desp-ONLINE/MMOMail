@@ -27,7 +27,7 @@ public class SendArgument implements CommandArgument {
 
     @Override
     public String getDescription() {
-        return "전송 <닉네임>";
+        return "[닉네임]";
     }
 
     @Override

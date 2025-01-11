@@ -13,6 +13,7 @@ public class ReloadArgument implements CommandArgument {
     public boolean execute(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         MessageConfig.getInstance().init();
         GUIConfig.getInstance().init();
+        commandSender.sendMessage("리로드 완료");
         return true;
     }
 
@@ -33,12 +34,12 @@ public class ReloadArgument implements CommandArgument {
 
     @Override
     public String getPermission() {
-        return "";
+        return "mmomail.reload";
     }
 
     @Override
     public String getPermissionMessage() {
-        return "";
+        return "§c권한이 없습니다.";
     }
 
     @Override
