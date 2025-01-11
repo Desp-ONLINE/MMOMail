@@ -2,6 +2,7 @@ package com.binggre.mmomail.commands.user;
 
 import com.binggre.binggreapi.command.BetterCommand;
 import com.binggre.binggreapi.command.CommandArgument;
+import com.binggre.mmomail.commands.user.arguments.ReloadArgument;
 import com.binggre.mmomail.commands.user.arguments.SendArgument;
 import com.binggre.mmomail.commands.user.arguments.ViewArgument;
 import org.bukkit.command.Command;
@@ -27,7 +28,8 @@ public class UserCommand extends BetterCommand implements TabCompleter {
     public List<CommandArgument> getArguments() {
         return List.of(
                 new SendArgument(),
-                new ViewArgument()
+                new ViewArgument(),
+                new ReloadArgument()
         );
     }
 

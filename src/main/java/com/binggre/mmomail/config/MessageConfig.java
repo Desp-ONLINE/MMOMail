@@ -53,23 +53,22 @@ public class MessageConfig {
             configDocument.put("sendNotFoundPlayer", sendNotFoundPlayer);
             configDocument.put("sendOnlineAndNotLoad", sendOnlineAndNotLoad);
             collection.insertOne(configDocument);
+        }
 
-        } else {
-            instance = FileManager.toObject(configDocument.toJson(), MessageConfig.class);
-            instance.prefix = ColorManager.format(instance.prefix);
+        instance = FileManager.toObject(configDocument.toJson(), MessageConfig.class);
+        instance.prefix = ColorManager.format(instance.prefix);
 
-            for (Field declaredField : instance.getClass().getDeclaredFields()) {
-                if (declaredField.getType() == String.class) {
-                    try {
-                        String str = declaredField.get(instance).toString();
-                        if (str.equals(instance.prefix)) {
-                            continue;
-                        }
-                        declaredField.setAccessible(true);
-                        declaredField.set(instance, instance.prefix + ColorManager.format(str));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+        for (Field declaredField : instance.getClass().getDeclaredFields()) {
+            if (declaredField.getType() == String.class) {
+                try {
+                    String str = declaredField.get(instance).toString();
+                    if (str.equals(instance.prefix)) {
+                        continue;
                     }
+                    declaredField.setAccessible(true);
+                    declaredField.set(instance, instance.prefix + ColorManager.format(str));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }
